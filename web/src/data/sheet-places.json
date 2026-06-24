@@ -2,7 +2,7 @@
   {
     "id": "sheet-jardin-du-luxembourg",
     "name": "Jardin du Luxembourg",
-    "category": "attraction",
+    "category": "park",
     "address": "Jardin du Luxembourg, 75006 Paris, France",
     "lat": 48.8466144,
     "lng": 2.3363309,
@@ -13,7 +13,7 @@
   {
     "id": "sheet-elite-beaut-11",
     "name": "Elite Beauté 11",
-    "category": "attraction",
+    "category": "shopping",
     "address": "40 Rue Popincourt, 75011 Paris, France",
     "lat": 48.8592932,
     "lng": 2.3760601,
@@ -35,7 +35,7 @@
   {
     "id": "sheet-bistrot-paul-bert",
     "name": "Bistrot Paul Bert",
-    "category": "attraction",
+    "category": "restaurant",
     "address": "18 Rue Paul Bert, 75011 Paris, France",
     "lat": 48.85221019999999,
     "lng": 2.3850177,
@@ -46,7 +46,7 @@
   {
     "id": "sheet-le-de-reuilly",
     "name": "Île de Reuilly",
-    "category": "attraction",
+    "category": "park",
     "address": "île de Reuilly, 75012 Paris, France",
     "lat": 48.830543,
     "lng": 2.414001,
@@ -57,7 +57,7 @@
   {
     "id": "sheet-onyx-restaurant-paris",
     "name": "Onyx Restaurant Paris",
-    "category": "attraction",
+    "category": "restaurant",
     "address": "71 Rue de Provence, 75009 Paris, France",
     "lat": 48.8742183,
     "lng": 2.3324602,
@@ -68,7 +68,7 @@
   {
     "id": "sheet-mus-e-de-l-orangerie",
     "name": "Musée de l'Orangerie",
-    "category": "attraction",
+    "category": "museum",
     "address": "Jardin des Tuileries, 75001 Paris, France",
     "lat": 48.8637884,
     "lng": 2.3226724,
@@ -79,7 +79,7 @@
   {
     "id": "sheet-tuileries-gardens",
     "name": "Tuileries Gardens",
-    "category": "attraction",
+    "category": "park",
     "address": "75001 Paris, France",
     "lat": 48.8634916,
     "lng": 2.3274943,
@@ -90,7 +90,7 @@
   {
     "id": "sheet-saint-eustache-church",
     "name": "Saint-Eustache Church",
-    "category": "attraction",
+    "category": "museum",
     "address": "2 Imp. Saint-Eustache, 75001 Paris, France",
     "lat": 48.86339030000001,
     "lng": 2.3451211,
@@ -101,7 +101,7 @@
   {
     "id": "sheet-verlet-paris",
     "name": "Verlet Paris",
-    "category": "attraction",
+    "category": "bakery",
     "address": "256 Rue Saint-Honoré, 75001 Paris, France",
     "lat": 48.8641489,
     "lng": 2.3338553,
@@ -112,7 +112,7 @@
   {
     "id": "sheet-papier-royal-paris",
     "name": "Papier Royal Paris",
-    "category": "attraction",
+    "category": "shopping",
     "address": "146 Gal de Valois, 75001 Paris, France",
     "lat": 48.8647776,
     "lng": 2.3384395,
@@ -123,7 +123,7 @@
   {
     "id": "sheet-mus-e-rodin",
     "name": "Musée Rodin",
-    "category": "attraction",
+    "category": "museum",
     "address": "77 Rue de Varenne, 75007 Paris, France",
     "lat": 48.8553072,
     "lng": 2.3158354,
@@ -134,7 +134,7 @@
   {
     "id": "sheet-grave-caf",
     "name": "Grave Café",
-    "category": "attraction",
+    "category": "bakery",
     "address": "8 Rue de Commaille, 75007 Paris, France",
     "lat": 48.8528037,
     "lng": 2.3239893,
@@ -145,7 +145,7 @@
   {
     "id": "sheet-le-bone-appart",
     "name": "Le Bone Appart",
-    "category": "attraction",
+    "category": "restaurant",
     "address": "9 Rue de Birague, 75004 Paris, France",
     "lat": 48.8545711,
     "lng": 2.3648762,
@@ -156,7 +156,7 @@
   {
     "id": "sheet-rori",
     "name": "RORI",
-    "category": "attraction",
+    "category": "restaurant",
     "address": "96 Rue Jean-Pierre Timbaud, 75011 Paris, France",
     "lat": 48.8678254,
     "lng": 2.3780696,
@@ -167,7 +167,7 @@
   {
     "id": "sheet-dior-museum",
     "name": "Dior Museum",
-    "category": "attraction",
+    "category": "museum",
     "address": "30 Av. Montaigne, 75008 Paris, France",
     "lat": 48.866847,
     "lng": 2.3063837,
@@ -535,7 +535,7 @@
   {
     "id": "sheet-brasserie-martin",
     "name": "Brasserie Martin",
-    "category": "shopping",
+    "category": "restaurant",
     "address": "24 Rue Saint-Ambroise, 75011 Paris, France",
     "lat": 48.8626501,
     "lng": 2.3786996,
@@ -546,7 +546,7 @@
   {
     "id": "sheet-maille-paris",
     "name": "Maille Paris",
-    "category": "shopping",
+    "category": "market",
     "address": "6 Pl. de la Madeleine, 75008 Paris, France",
     "lat": 48.8689215,
     "lng": 2.3244866,
