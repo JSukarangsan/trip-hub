@@ -633,10 +633,23 @@ export default function App() {
               <span /><span /><span />
             </button>
             {menuOpen && (
-              <div className="nav-menu">
-                <button className={view === "places" ? "active" : ""} onClick={() => { setView("places"); setMenuOpen(false); }}>Places</button>
-                <button className={view === "itinerary" ? "active" : ""} onClick={() => { setView("itinerary"); setMenuOpen(false); }}>Itinerary</button>
-              </div>
+              <>
+                <div className="nav-backdrop" onClick={() => setMenuOpen(false)} />
+                <div className="nav-menu">
+                  <button className={view === "places" ? "active" : ""} onClick={() => { setView("places"); setMenuOpen(false); }}>Places</button>
+                  <button className={view === "itinerary" ? "active" : ""} onClick={() => { setView("itinerary"); setMenuOpen(false); }}>Itinerary</button>
+                  <div className="nav-menu-extras">
+                    <PhraseTray />
+                    <NeighborhoodTray />
+                    {daysLeft > 0 && (
+                      <div className="nav-menu-countdown">
+                        <span className="countdown-num">{daysLeft}</span>
+                        <span className="countdown-label">days to go</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
             )}
           </div>
           <div>
