@@ -444,11 +444,9 @@ function MapMarkers({
                 {"★".repeat(Math.round(details.rating))}{"☆".repeat(5 - Math.round(details.rating))} {details.rating}
               </div>
             )}
-            {details.address && (
-              <p style={{ fontSize: "0.8rem", color: "#4a4a6a", margin: "4px 0" }}>
-                {details.address}
-              </p>
-            )}
+            <p style={{ fontSize: "0.8rem", color: "#4a4a6a", margin: "4px 0" }}>
+              {selectedPlace.address || details.address || ""}
+            </p>
             {details.openNow !== null && (
               <details style={{ fontSize: "0.8rem", margin: "4px 0" }}>
                 <summary style={{ cursor: "pointer", listStyle: "none", display: "flex", alignItems: "center", gap: 4 }}>
