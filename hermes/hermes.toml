@@ -1,0 +1,80 @@
+[model]
+primary = "anthropic/claude-sonnet-4-6"
+fallback = "anthropic/claude-haiku-4-5"
+
+[channels.telegram]
+enabled = true
+botToken = "${TELEGRAM_BOT_TOKEN}"
+dmPolicy = "allowlist"
+allowFrom = [6848894134]
+requireMention = false  # In DMs, respond to everything
+
+[channels.telegram.groups."-5188677820"]
+requireMention = true
+groupPolicy = "allowlist"
+allowFrom = [6848894134]  # Add Jess's ID here when she joins
+
+[channels.telegram.streaming]
+mode = "partial"
+
+[channels.telegram.actions]
+sendMessage = true
+deleteMessage = false
+reactions = true
+
+[channels.telegram.settings]
+linkPreview = true
+mediaMaxMb = 20
+replyToMode = "first"
+reactionNotifications = "own"
+
+[session]
+dmScope = "per-channel-peer"
+reset = { mode = "daily", atHour = 4 }
+
+[session.threadBindings]
+enabled = true
+idleHours = 48  # Longer idle for travel context continuity
+
+[cron]
+enabled = true
+maxConcurrentRuns = 1
+
+[cron.retry]
+maxAttempts = 3
+backoffMs = [60000, 120000, 300000]
+retryOn = ["rate_limit", "overloaded", "network", "server_error"]
+
+# Morning brief — mode-aware (planning vs trip)
+[[cron.jobs]]
+name = "Morning Brief"
+schedule = "0 14 * * *"
+timezone = "UTC"
+message = "Check today's date. If today is BEFORE July 17 2026, run PLANNING MODE. If today is July 17 2026 or later, run TRIP MODE.\n\nPLANNING MODE (before Jul 17): You are in pre-trip planning. Jon is in LA (timezone: America/Los_Angeles, this message arrives ~7am his time). Send a focused planning brief: (1) COUNTDOWN — days until departure Jul 17. (2) TOP PRIORITY — the single most important open task or gap to close today. Check the To Do tab and be specific. (3) ITINERARY GAPS — pick 2-3 days with empty Activities/Meals columns and suggest specific plans with real venue names. Push for decisions. (4) BOOKING ALERT — anything needing advance reservation that isn't booked. July/August Paris fills fast. (5) If within 14 days of departure, add a PACKING item. Keep it under 300 words. Be pushy.\n\nTRIP MODE (Jul 17+): Run the daily digest skill. Check today's date against the itinerary. Pull today's calendar events from Gmail. Check weather for current location. Read context/local-calendar.md for market days and events. Read visited.md and do NOT suggest anything already visited. Suggest 1-2 activities and 1 food spot from the sheet. Include a phrase du jour — useful street-level French, not textbook. Keep it under 400 words."
+channel = "telegram"
+to = "group:-5188677820"
+
+# Metro + weather alert — trip mode only (Jul 17+)
+[[cron.jobs]]
+name = "Morning Alerts"
+schedule = "0 6 * * *"
+timezone = "Europe/Paris"
+message = "Check today's date. If today is BEFORE July 17 2026, do nothing — send NO message. If today is July 17+ 2026: check RATP disruptions on metro lines L6, L8, L10. Check today's hourly weather for current location (Paris or Provence based on itinerary). Only message the group if there's a disruption or significant weather change. If nothing notable, stay completely silent."
+channel = "telegram"
+to = "group:-5188677820"
+
+# Evening check-in — mode-aware
+[[cron.jobs]]
+name = "Evening Check-in"
+schedule = "0 2 * * *"
+timezone = "UTC"
+message = "Check today's date. If today is BEFORE July 17 2026, do nothing — send NO message. If today is July 17+ 2026: Evening check-in. (1) Ask what they did today — if they mention a place, log to context/visited.md. (2) Offer 1 dinner rec if they haven't eaten. (3) Tomorrow's weather with packing nudge. (4) Reminder if reservation or early plan tomorrow. Keep it short."
+channel = "telegram"
+to = "group:-5188677820"
+
+[skills]
+watch = true
+watchDebounceMs = 250
+
+[plugins]
+enabled = []
