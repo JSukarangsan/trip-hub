@@ -279,7 +279,7 @@ export const igPlaces: Place[] = [
   {
     id: "ig-burning-bar",
     name: "Burning Bar Paris",
-    category: "pilates",
+    category: "fitness",
     address: "42 Avenue Raymond Poincare, 75016 Paris",
     lat: 48.8664203,
     lng: 2.2859668,

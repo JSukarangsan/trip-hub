@@ -1,14 +1,14 @@
 export type Category =
   | "lodging"
-  | "gym"
-  | "pilates"
+  | "fitness"
   | "restaurant"
   | "market"
   | "park"
   | "museum"
   | "daytrip"
   | "bakery"
-  | "attraction";
+  | "attraction"
+  | "shopping";
 
 export interface Place {
   id: string;
@@ -29,8 +29,7 @@ export interface Place {
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   lodging: "Lodging",
-  gym: "Gym",
-  pilates: "Pilates & Yoga",
+  fitness: "Fitness",
   restaurant: "Restaurant",
   market: "Market",
   park: "Park & Garden",
@@ -38,12 +37,12 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   daytrip: "Day Trip",
   bakery: "Bakery & Cafe",
   attraction: "Attraction",
+  shopping: "Shopping",
 };
 
 export const CATEGORY_COLORS: Record<Category, string> = {
   lodging: "#1e3a5f",
-  gym: "#e74c3c",
-  pilates: "#9b59b6",
+  fitness: "#e74c3c",
   restaurant: "#e67e22",
   market: "#27ae60",
   park: "#2ecc71",
@@ -51,6 +50,7 @@ export const CATEGORY_COLORS: Record<Category, string> = {
   daytrip: "#f39c12",
   bakery: "#d4a574",
   attraction: "#e91e63",
+  shopping: "#9b59b6",
 };
 
 export const APARTMENT_COORDS = { lat: 48.8534, lng: 2.2867 }; // Bir-Hakeim / Grenelle area
@@ -113,11 +113,11 @@ export const places: Place[] = [
     segment: "paris",
   },
 
-  // === GYMS ===
+  // === FITNESS ===
   {
     id: "gym-basicfit",
     name: "Basic-Fit Dupleix",
-    category: "gym",
+    category: "fitness",
     address: "Near Dupleix metro, 15e Paris",
     lat: 48.8507,
     lng: 2.2926,
@@ -133,7 +133,7 @@ export const places: Place[] = [
   {
     id: "gym-neoness",
     name: "Neoness La Motte-Picquet",
-    category: "gym",
+    category: "fitness",
     address: "Near La Motte-Picquet metro, 15e Paris",
     lat: 48.8494,
     lng: 2.2998,
@@ -149,7 +149,7 @@ export const places: Place[] = [
   {
     id: "gym-fitnesspark",
     name: "Fitness Park Rue du Theatre",
-    category: "gym",
+    category: "fitness",
     address: "Rue du Theatre, 15e Paris",
     lat: 48.8468,
     lng: 2.2878,
@@ -165,7 +165,7 @@ export const places: Place[] = [
   {
     id: "gym-frontdeseine",
     name: "Front De Seine",
-    category: "gym",
+    category: "fitness",
     address: "Near Bir-Hakeim, 15e Paris",
     lat: 48.8548,
     lng: 2.2845,
@@ -179,11 +179,10 @@ export const places: Place[] = [
     segment: "paris",
   },
 
-  // === PILATES & YOGA ===
   {
     id: "pilates-deeply",
     name: "Deeply Studio de Pilates",
-    category: "pilates",
+    category: "fitness",
     address: "Near Boucicaut metro, 15e Paris",
     lat: 48.8413,
     lng: 2.2876,
@@ -199,7 +198,7 @@ export const places: Place[] = [
   {
     id: "pilates-newme",
     name: "The New Me Reformer Pilates",
-    category: "pilates",
+    category: "fitness",
     address: "Near Convention metro, 15e Paris",
     lat: 48.8375,
     lng: 2.2968,
@@ -215,7 +214,7 @@ export const places: Place[] = [
   {
     id: "pilates-studio15",
     name: "Studio15 Pilates",
-    category: "pilates",
+    category: "fitness",
     address: "Near Javel metro, 15e Paris",
     lat: 48.8435,
     lng: 2.2768,
@@ -231,7 +230,7 @@ export const places: Place[] = [
   {
     id: "pilates-clubpilates",
     name: "Club Pilates Paris Convention",
-    category: "pilates",
+    category: "fitness",
     address: "Near Convention metro, 15e Paris",
     lat: 48.8362,
     lng: 2.2955,
@@ -247,7 +246,7 @@ export const places: Place[] = [
   {
     id: "pilates-aja",
     name: "Aja House",
-    category: "pilates",
+    category: "fitness",
     address: "Near Ecole Militaire, 7e Paris",
     lat: 48.8556,
     lng: 2.3065,
@@ -263,7 +262,7 @@ export const places: Place[] = [
   {
     id: "pilates-dreamseven",
     name: "Dream Seven Paris",
-    category: "pilates",
+    category: "fitness",
     address: "Near George V metro, 8e Paris",
     lat: 48.8719,
     lng: 2.3008,
@@ -279,7 +278,7 @@ export const places: Place[] = [
   {
     id: "pilates-ora",
     name: "Ora Studio",
-    category: "pilates",
+    category: "fitness",
     address: "Faubourg Saint-Honore, 8e Paris",
     lat: 48.8746,
     lng: 2.3125,
@@ -295,7 +294,7 @@ export const places: Place[] = [
   {
     id: "pilates-ksport",
     name: "Ksport Studio 7",
-    category: "pilates",
+    category: "fitness",
     address: "Near Rue du Bac, 7e Paris",
     lat: 48.8558,
     lng: 2.3252,
@@ -659,5 +658,95 @@ export const places: Place[] = [
     distanceFromApt: "Provence",
     notes: "Luberon village. Peter Mayle's A Year in Provence.",
     segment: "provence",
+  },
+
+  // === SHOPPING ===
+  {
+    id: "shopping-maille",
+    name: "Maille Paris",
+    category: "shopping",
+    address: "6 Place de la Madeleine, 75008 Paris",
+    lat: 48.8689,
+    lng: 2.3245,
+    distanceFromApt: "23 min metro",
+    notes: "Mustard/condiment boutique. via @baochitravel",
+    segment: "paris",
+  },
+  {
+    id: "shopping-melodies-graphiques",
+    name: "Melodies Graphiques",
+    category: "shopping",
+    address: "10 Rue du Pont Louis-Philippe, 75004 Paris",
+    lat: 48.855,
+    lng: 2.3557,
+    distanceFromApt: "32 min metro",
+    notes: "Antique paper store. via @chloe.legras",
+    segment: "paris",
+  },
+  {
+    id: "shopping-dior",
+    name: "Christian Dior Paris",
+    category: "shopping",
+    address: "30 Avenue Montaigne, 75008 Paris",
+    lat: 48.8667,
+    lng: 2.3061,
+    distanceFromApt: "25 min metro",
+    notes: "Flagship boutique on Avenue Montaigne. via @maddiemclark",
+    segment: "paris",
+  },
+  {
+    id: "shopping-catherine-b",
+    name: "Les 3 Marches de Catherine B",
+    category: "shopping",
+    address: "1 Rue Guisarde, 75006 Paris",
+    lat: 48.8519,
+    lng: 2.3351,
+    distanceFromApt: "26 min metro",
+    notes: "Vintage shopping spots. via @designerstories.nl",
+    segment: "paris",
+  },
+  {
+    id: "shopping-marin-montagut",
+    name: "Marin Montagut",
+    category: "shopping",
+    address: "14 Rue Madame, 75006 Paris",
+    lat: 48.8482,
+    lng: 2.3315,
+    distanceFromApt: "25 min metro",
+    notes: "Souvenir shop. via @mamadoeseurope",
+    segment: "paris",
+  },
+  {
+    id: "shopping-merci",
+    name: "Merci",
+    category: "shopping",
+    address: "111 Boulevard Beaumarchais, 75003 Paris",
+    lat: 48.8608,
+    lng: 2.3669,
+    distanceFromApt: "36 min metro",
+    notes: "Concept store — fashion, home, cafe. via @suzyandaustin",
+    segment: "paris",
+  },
+  {
+    id: "shopping-valois-vintage",
+    name: "Valois Vintage Paris",
+    category: "shopping",
+    address: "Rue des Saussaies, 75008 Paris",
+    lat: 48.8712,
+    lng: 2.3173,
+    distanceFromApt: "21 min metro",
+    notes: "Luxury vintage boutique. via @toniscaglione",
+    segment: "paris",
+  },
+  {
+    id: "shopping-landline",
+    name: "Landline",
+    category: "shopping",
+    address: "Avenue Parmentier, 75011 Paris",
+    lat: 48.8673,
+    lng: 2.3728,
+    distanceFromApt: "39 min metro",
+    notes: "Home goods shop. via @preetigills",
+    segment: "paris",
   },
 ];
