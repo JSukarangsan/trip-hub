@@ -25,6 +25,7 @@ export interface Place {
   hours?: string;
   metro?: string;
   segment?: "paris" | "provence" | "pre-trip";
+  igPostUrl?: string;
 }
 
 export const CATEGORY_LABELS: Record<Category, string> = {

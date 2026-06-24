@@ -417,17 +417,23 @@ function MapMarkers({
                 )}
               </div>
             )}
-            <div
-              style={{
-                fontSize: "0.7rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                fontWeight: 600,
-                color: CATEGORY_COLORS[selectedPlace.category],
-                marginBottom: 2,
-              }}
-            >
-              {CATEGORY_LABELS[selectedPlace.category]}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  fontWeight: 600,
+                  color: CATEGORY_COLORS[selectedPlace.category],
+                }}
+              >
+                {CATEGORY_LABELS[selectedPlace.category]}
+              </div>
+              {selectedPlace.igPostUrl && (
+                <a href={selectedPlace.igPostUrl} target="_blank" rel="noopener noreferrer" title="View on Instagram" style={{ opacity: 0.5, transition: "opacity 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")} onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.5")}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E4405F" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="5" /><circle cx="17.5" cy="6.5" r="1.5" fill="#E4405F" stroke="none" /></svg>
+                </a>
+              )}
             </div>
             <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 4, color: "#0d1b3e" }}>
               {selectedPlace.name}
@@ -761,6 +767,9 @@ export default function App() {
                       <div className="place-notes">{place.notes}</div>
                       {place.pricing && <div className="place-pricing">{place.pricing}</div>}
                     </div>
+                    {place.igPostUrl && <span className="ig-icon-list" title="From Instagram">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4a35a" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="5" /><circle cx="17.5" cy="6.5" r="1.5" fill="#c4a35a" stroke="none" /></svg>
+                    </span>}
                   </div>
                 ))}
               </div>

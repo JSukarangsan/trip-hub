@@ -13,6 +13,7 @@ export const igPlaces: Place[] = [
     notes:
       "Vietnamese restaurant specializing in Northern pho. Michelin-recognized. Make reservations ASAP. Via @foodfindsryan",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DZ53DpKPDCZ/",
   },
   {
     id: "ig-brasserie-martin",
@@ -25,6 +26,7 @@ export const igPlaces: Place[] = [
     notes:
       "Classic Parisian brasserie in the 11e. Featured in best restaurants in Paris list. Via @maddiemclark",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DCz0TOvoE01/",
   },
   {
     id: "ig-early-june",
@@ -37,6 +39,7 @@ export const igPlaces: Place[] = [
     notes:
       "Wine bar near Canal St Martin. From Dua Lipa's Paris guide. Via @mattconcierge",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DWjN4a9jDZ6/",
   },
   {
     id: "ig-the-hood",
@@ -49,6 +52,7 @@ export const igPlaces: Place[] = [
     notes:
       "Creative cafe-restaurant with modern Singaporean flavours. Part of Paris's rising Asian dining scene. Via @roadbook",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DZFdYkun935/",
   },
   {
     id: "ig-cafe-1902-petit-palais",
@@ -61,6 +65,7 @@ export const igPlaces: Place[] = [
     notes:
       "Stunning cafe inside Petit Palais museum. Garden courtyard with fountain. Serene oasis near Champs-Elysees. Via @pariscafeproject",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DYagGm-tAqB/",
   },
   {
     id: "ig-bistrot-paul-bert",
@@ -73,6 +78,7 @@ export const igPlaces: Place[] = [
     notes:
       "Classic bistrot, famous for steak au poivre. Top 10 bites in Paris. Via @eat_this_",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DZLoWzZkbQs/",
   },
   {
     id: "ig-riverose-paris",
@@ -85,6 +91,7 @@ export const igPlaces: Place[] = [
     notes:
       "Brunch spot right in front of the Eiffel Tower. Ultra-indulgent dishes and colorful drinks. Via @riveroseparis",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DYOyvBkjddq/",
   },
   {
     id: "ig-fabula",
@@ -97,6 +104,7 @@ export const igPlaces: Place[] = [
     notes:
       "Cafe-restaurant near Le Marais. Via @mia.in.france",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DYC2sDeNA3E/",
   },
   {
     id: "ig-onyx-restaurant",
@@ -109,6 +117,7 @@ export const igPlaces: Place[] = [
     notes:
       "Elevated lunch menu. Fine dining in the 9e. Via @seb_hed",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DXp4BWxgJ5v/",
   },
   {
     id: "ig-sugaar",
@@ -121,6 +130,7 @@ export const igPlaces: Place[] = [
     notes:
       "Basque steakhouse in Saint-Germain. Recommended by Dua Lipa in Tatler Travel guide. Via @tatlertravel",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DXsuipojDpv/",
   },
   {
     id: "ig-le-jardin-du-petit-palais",
@@ -133,6 +143,7 @@ export const igPlaces: Place[] = [
     notes:
       "Garden courtyard cafe inside Petit Palais. Fountain and museum views. A hidden quiet spot. Via @ang.and.chris",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DUD8ni7kfjh/",
   },
   {
     id: "ig-rotisserie-segar",
@@ -145,6 +156,7 @@ export const igPlaces: Place[] = [
     notes:
       "Famous rotisserie chicken caesar sandwich on Rue Mouffetard. Via @jacksdiningroom",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DZnxC-ZSlg2/",
   },
   {
     id: "ig-rori",
@@ -157,6 +169,7 @@ export const igPlaces: Place[] = [
     notes:
       "Kid-friendly pizza spot. The Red Pie is a favorite. Great for a quick pizza break with Sloane. Via @fanny__petit",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DVvIYJrjE-6/",
   },
   {
     id: "ig-verlet-paris",
@@ -169,6 +182,7 @@ export const igPlaces: Place[] = [
     notes:
       "Historic coffee house near Palais Royal. One of Paris's treasure spots. Via @studiocartashop",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DT2ujEOjqFr/",
   },
 
   // === MARKETS & FOOD HALLS ===
@@ -183,6 +197,7 @@ export const igPlaces: Place[] = [
     notes:
       "Legendary gourmet food hall at Le Bon Marche. Over 100 years old. Clean ingredients, whole foods, artisanal products. Via @thehapawellness",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DZ5VFLdiUoq/",
   },
   {
     id: "ig-marche-enfants-rouges",
@@ -195,6 +210,7 @@ export const igPlaces: Place[] = [
     notes:
       "Paris's oldest food market, 400 years old. Amazing variety of prepared food stalls. Via @eatingwithtod",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DZR9bJFI_Fy/",
   },
 
   // === BAKERIES & FOOD SHOPS ===
@@ -209,6 +225,7 @@ export const igPlaces: Place[] = [
     notes:
       "Iconic mustard and condiment boutique on Place de la Madeleine. Great souvenir spot. Via @baochitravel",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DY41Wt8MRWU/",
   },
 
   // === MUSEUMS ===
@@ -223,6 +240,7 @@ export const igPlaces: Place[] = [
     notes:
       "Free Paris history museum in Le Marais. Beautiful courtyard. Via @marigladkaya",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DY2ABGJtfW_/",
   },
   {
     id: "ig-musee-rodin",
@@ -235,6 +253,7 @@ export const igPlaces: Place[] = [
     notes:
       "Sunlit rooms and romantic sculpture gardens. One of the most magical spots in Paris. Via @rileejsmith",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DYk467fINXk/",
   },
   {
     id: "ig-dior-museum",
@@ -247,6 +266,7 @@ export const igPlaces: Place[] = [
     notes:
       "La Galerie Dior. EUR 16 entry. Great for a bestie day out. Via @toniscaglione",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DJyU7fMIhyE/",
   },
 
   // === PARKS ===
@@ -261,6 +281,7 @@ export const igPlaces: Place[] = [
     notes:
       "Romantic, hidden-garden feel. Less structured than other Paris parks. Fantasy landscape with historic fragments. Via @toniscaglione",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DXfCjw0DYkv/",
   },
   {
     id: "ig-ile-de-reuilly",
@@ -273,6 +294,7 @@ export const igPlaces: Place[] = [
     notes:
       "Hidden Paris gem in the 12e. A side of Paris most people never see. Via @kianaatravel",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DYAPOQ6i85i/",
   },
 
   // === PILATES & YOGA ===
@@ -287,6 +309,7 @@ export const igPlaces: Place[] = [
     notes:
       "Hot yoga and pilates studio. Luxe self-care and fitness experience. Via @maddiemclark",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DIONzetoPTT/",
   },
 
   // === ATTRACTIONS ===
@@ -301,6 +324,7 @@ export const igPlaces: Place[] = [
     notes:
       "Iconic French puppet theatre, 200+ years old. Beloved way to introduce kids to theatre. Great for Sloane. Via @americanmominparis",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DAwJCs7tFKt/",
   },
   {
     id: "ig-saint-eustache",
@@ -313,6 +337,7 @@ export const igPlaces: Place[] = [
     notes:
       "Immersive light experience inside the church. Free. Near Les Halles. Via @dayoneinparis",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DY0I1RpoRX1/",
   },
   {
     id: "ig-bonhomme-de-bois",
@@ -325,6 +350,7 @@ export const igPlaces: Place[] = [
     notes:
       "Classic Parisian toy shop. Great for kids. Via @littlegeneralkids",
     segment: "paris",
+    igPostUrl: "https://www.instagram.com/p/DOafToljEUn/",
   },
 
   // === PROVENCE ===
@@ -339,5 +365,6 @@ export const igPlaces: Place[] = [
     notes:
       "Luxury hotel restaurant above Gordes village. Featured in Emily in Paris. 2.5 hrs from Paris by train. Via @theluxurywifestyle",
     segment: "provence",
+    igPostUrl: "https://www.instagram.com/p/DXE5x-wDUEV/",
   },
 ];
