@@ -15,7 +15,6 @@ import {
   type Category,
 } from "./data/places";
 import { igPlaces } from "./data/ig-places";
-import { getTodaysPhrase, getTodaysNeighborhood } from "./data/daily-content";
 import { itinerary, segmentColor, isToday } from "./data/itinerary";
 import "./App.css";
 
@@ -65,6 +64,19 @@ function useZoom() {
     return () => listener.remove();
   }, [map]);
   return zoom;
+}
+
+function MapPanHandler({ selectedId, places }: { selectedId: string | null; places: Place[] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map || !selectedId) return;
+    const place = places.find((p) => p.id === selectedId);
+    if (!place) return;
+    map.panTo({ lat: place.lat, lng: place.lng });
+    const zoom = map.getZoom() ?? 13;
+    if (zoom < 15) map.setZoom(15);
+  }, [map, selectedId, places]);
+  return null;
 }
 
 function pinSize(zoom: number, isSelected: boolean): number {
@@ -248,7 +260,6 @@ function usePlaceDetails(place: Place | undefined) {
           },
           maxResultCount: 1,
         };
-        // @ts-expect-error - searchByText is on the new Place class
         const { places: results } = await google.maps.places.Place.searchByText(request);
         const p = results?.[0];
         if (!p) return;
@@ -257,7 +268,7 @@ function usePlaceDetails(place: Place | undefined) {
         let openNow: boolean | null = null;
         let hoursText: string | null = null;
         if (hours) {
-          openNow = hours.periods ? isOpenNow(hours.periods) : null;
+          openNow = hours.periods ? isOpenNow(hours.periods as any) : null;
           hoursText = hours.weekdayDescriptions?.join(" | ") ?? null;
         }
 
@@ -281,9 +292,9 @@ function usePlaceDetails(place: Place | undefined) {
 }
 
 function isOpenNow(periods: Array<{ open: { hour: number; minute: number; day: number }; close?: { hour: number; minute: number; day: number } }>): boolean {
-  const now = new Date();
-  const day = now.getDay();
-  const mins = now.getHours() * 60 + now.getMinutes();
+  const paris = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Paris" }));
+  const day = paris.getDay();
+  const mins = paris.getHours() * 60 + paris.getMinutes();
   for (const period of periods) {
     if (period.open.day === day) {
       const openMins = period.open.hour * 60 + period.open.minute;
@@ -305,7 +316,6 @@ function MapMarkers({
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 }) {
-  const map = useMap();
   const zoom = useZoom();
   const selectedPlace = filtered.find((p) => p.id === selectedId);
   const details = usePlaceDetails(selectedPlace);
@@ -313,9 +323,8 @@ function MapMarkers({
   const handleMarkerClick = useCallback(
     (place: Place) => {
       onSelect(place.id);
-      map?.panTo({ lat: place.lat, lng: place.lng });
     },
-    [map, onSelect]
+    [onSelect]
   );
 
   return (
@@ -451,79 +460,92 @@ function useLiveClocks() {
   return { la: fmt("America/Los_Angeles"), ny: fmt("America/New_York"), paris: fmt("Europe/Paris") };
 }
 
-function TodayCard() {
-  const [open, setOpen] = useState(false);
-  const phrase = getTodaysPhrase();
-  const hood = getTodaysNeighborhood();
-  return (
-    <div className="today-card" onClick={() => setOpen(!open)}>
-      <div className="today-summary">
-        <span className="today-label">Aujourd'hui</span>
-        <span className="today-preview">
-          {phrase.french} &middot; {hood.arrondissement} {hood.name}
-        </span>
-        <span className="today-chevron">{open ? "\u25B4" : "\u25BE"}</span>
-      </div>
-      {open && (
-        <div className="today-details">
-          <div className="today-section">
-            <div className="today-section-label">Phrase du jour</div>
-            <div className="today-phrase-french">{phrase.french}</div>
-            <div className="today-phrase-pron">{phrase.pronunciation}</div>
-            <div className="today-phrase-eng">{phrase.english}</div>
-            <div className="today-phrase-ctx">{phrase.context}</div>
-          </div>
-          <div className="today-section">
-            <div className="today-section-label">Quartier du jour</div>
-            <div className="today-hood-name">{hood.arrondissement} &mdash; {hood.name}</div>
-            <div className="today-hood-tip">{hood.tip}</div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+
+function segmentIcon(segment: string): string {
+  switch (segment) {
+    case "Flight": return "\u2708";
+    case "Travel": return "\u{1F697}";
+    case "Provence": return "\u{1F33B}";
+    case "LA": return "\u{1F334}";
+    default: return "\u{1F5FC}";
+  }
 }
 
-function ItineraryView({ onDayClick }: { onDayClick: (lat: number, lng: number) => void }) {
-  const todayIdx = itinerary.findIndex((d) => isToday(d.date));
+function ItineraryPage() {
+  // Group by week
+  const weeks: { label: string; days: typeof itinerary }[] = [];
+  let currentWeek: typeof itinerary = [];
+  let weekStart = "";
+
+  itinerary.forEach((day, i) => {
+    if (i === 0 || day.dayOfWeek === "Mon") {
+      if (currentWeek.length > 0) {
+        weeks.push({ label: weekStart, days: currentWeek });
+      }
+      currentWeek = [day];
+      const d = new Date(day.date + "T12:00:00");
+      weekStart = d.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+    } else {
+      currentWeek.push(day);
+    }
+  });
+  if (currentWeek.length > 0) {
+    const lastDay = new Date(currentWeek[currentWeek.length - 1].date + "T12:00:00");
+    weeks.push({ label: weekStart + " \u2013 " + lastDay.toLocaleDateString("en-US", { month: "long", day: "numeric" }), days: currentWeek });
+  }
+  // Fix first week label
+  if (weeks.length > 0) {
+    const firstEnd = new Date(weeks[0].days[weeks[0].days.length - 1].date + "T12:00:00");
+    weeks[0].label = weeks[0].label + " \u2013 " + firstEnd.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+  }
+
   return (
-    <div className="itinerary-list">
-      {itinerary.map((day, i) => {
-        const today = isToday(day.date);
-        return (
-          <div
-            key={day.date}
-            className={`itinerary-day${today ? " today" : ""}`}
-            onClick={() => onDayClick(day.lodgingLat, day.lodgingLng)}
-            ref={today ? (el) => el?.scrollIntoView({ block: "center" }) : undefined}
-          >
-            <div className="itin-header">
-              <span className="itin-date">
-                {new Date(day.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              </span>
-              <span className="itin-dow">{day.dayOfWeek}</span>
-              <span className="itin-segment" style={{ backgroundColor: segmentColor(day.segment) }}>
-                {day.segment}
-              </span>
-              {day.jessSchedule && (
-                <span className={`itin-jess ${day.jessSchedule === "Working" ? "working" : ""}`}>
-                  {day.jessSchedule === "Working" ? "Jess working" : day.jessSchedule === "PTO" ? "Jess PTO" : day.jessSchedule}
-                </span>
-              )}
+    <div className="itin-page">
+      <div className="itin-page-inner">
+        {weeks.map((week) => (
+          <div key={week.label} className="itin-week">
+            <h2 className="itin-week-label">{week.label}</h2>
+            <div className="itin-timeline">
+              {week.days.map((day) => {
+                const today = isToday(day.date);
+                const d = new Date(day.date + "T12:00:00");
+                return (
+                  <div key={day.date} className={`itin-tl-item${today ? " today" : ""}`}>
+                    <div className="itin-tl-date">
+                      <span className="itin-tl-dow">{day.dayOfWeek}</span>
+                      <span className="itin-tl-day">{d.getDate()}</span>
+                    </div>
+                    <div className="itin-tl-line">
+                      <div className="itin-tl-icon" style={{ backgroundColor: segmentColor(day.segment) }}>
+                        {segmentIcon(day.segment)}
+                      </div>
+                    </div>
+                    <div className="itin-tl-content">
+                      <div className="itin-tl-title">{day.lodging}</div>
+                      <div className="itin-tl-segment" style={{ color: segmentColor(day.segment) }}>
+                        {day.segment}
+                        {day.jessSchedule && (
+                          <span className={day.jessSchedule === "Working" ? "itin-tl-working" : "itin-tl-pto"}>
+                            {" \u00B7 "}Jess {day.jessSchedule.toLowerCase()}
+                          </span>
+                        )}
+                      </div>
+                      {day.activities && <div className="itin-tl-detail itin-tl-activity">{day.activities}</div>}
+                      {day.meals && <div className="itin-tl-detail itin-tl-meal">{day.meals}</div>}
+                      {day.notes && <div className="itin-tl-detail itin-tl-note">{day.notes}</div>}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="itin-lodging">{day.lodging}</div>
-            {day.activities && <div className="itin-activities">{day.activities}</div>}
-            {day.meals && <div className="itin-meals">{day.meals}</div>}
-            {day.notes && <div className="itin-notes">{day.notes}</div>}
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 }
 
 export default function App() {
-  const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<Category | "all">("all");
   const [distanceFilter, setDistanceFilter] = useState<DistanceFilter>("all");
   const [segmentFilter, setSegmentFilter] = useState<"all" | "paris" | "provence">("all");
@@ -531,7 +553,8 @@ export default function App() {
   const [showList, setShowList] = useState(true);
   const [showTransit, setShowTransit] = useState(false);
   const [showArrondissements, setShowArrondissements] = useState(false);
-  const [activeTab, setActiveTab] = useState<"places" | "itinerary">("places");
+  const [view, setView] = useState<"places" | "itinerary">("places");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const daysLeft = getDaysUntilTrip();
   const clocks = useLiveClocks();
@@ -547,18 +570,9 @@ export default function App() {
       if (segmentFilter !== "all" && place.segment !== segmentFilter) return false;
       if (distanceFilter !== "all" && classifyDistance(place.distanceFromApt) !== distanceFilter)
         return false;
-      if (search) {
-        const q = search.toLowerCase();
-        return (
-          place.name.toLowerCase().includes(q) ||
-          place.notes.toLowerCase().includes(q) ||
-          place.address.toLowerCase().includes(q) ||
-          (place.metro && place.metro.toLowerCase().includes(q))
-        );
-      }
       return true;
     });
-  }, [search, categoryFilter, distanceFilter, segmentFilter]);
+  }, [categoryFilter, distanceFilter, segmentFilter]);
 
   const defaultCenter = useMemo(() => {
     if (segmentFilter === "provence") return { lat: 43.85, lng: 5.1 };
@@ -571,63 +585,52 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="header-left">
+          <div className="hamburger-wrap">
+            <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+              <span /><span /><span />
+            </button>
+            {menuOpen && (
+              <div className="nav-menu">
+                <button className={view === "places" ? "active" : ""} onClick={() => { setView("places"); setMenuOpen(false); }}>Places</button>
+                <button className={view === "itinerary" ? "active" : ""} onClick={() => { setView("itinerary"); setMenuOpen(false); }}>Itinerary</button>
+              </div>
+            )}
+          </div>
           <div>
             <h1>France 2026</h1>
             <span className="subtitle">Trip Hub</span>
           </div>
         </div>
         <div className="header-right">
-          <span className="header-clocks">
-            LA {clocks.la} &middot; NY {clocks.ny} &middot; Paris {clocks.paris}
-          </span>
-          {daysLeft > 0 && <span className="countdown">{daysLeft}d to go</span>}
-          {daysLeft <= 0 && daysLeft > -42 && <span className="countdown">Bon voyage!</span>}
+          <div className="header-clocks">
+            <div className="clock-item"><span className="clock-time">{clocks.la}</span><span className="clock-city">Los Angeles</span></div>
+            <div className="clock-item"><span className="clock-time">{clocks.ny}</span><span className="clock-city">New York</span></div>
+            <div className="clock-item"><span className="clock-time">{clocks.paris}</span><span className="clock-city">Paris</span></div>
+          </div>
+          <div className="header-divider" />
+          <div className="header-countdown">
+            {daysLeft > 0 && <><span className="countdown-num">{daysLeft}</span><span className="countdown-label">days to go</span></>}
+            {daysLeft <= 0 && daysLeft > -42 && <span className="countdown-label">Bon voyage!</span>}
+          </div>
         </div>
       </header>
 
+      {view === "itinerary" ? (
+        <ItineraryPage />
+      ) : (
       <div className="main">
         <aside className={`sidebar${!showList ? " hidden-mobile" : ""}`}>
-          <div className="sidebar-tabs">
-            <button
-              className={`sidebar-tab${activeTab === "places" ? " active" : ""}`}
-              onClick={() => setActiveTab("places")}
-            >
-              Places
-            </button>
-            <button
-              className={`sidebar-tab${activeTab === "itinerary" ? " active" : ""}`}
-              onClick={() => setActiveTab("itinerary")}
-            >
-              Itinerary
-            </button>
-          </div>
-
-          <TodayCard />
-
-          {activeTab === "places" ? (
-            <>
               <div className="filters">
-                <input
-                  className="search-input"
-                  type="text"
-                  placeholder="Search places..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-
-                <div>
-                  <div className="filter-section-label" style={{ marginBottom: 6 }}>Region</div>
-                  <div className="segment-toggle">
-                    {(["all", "paris", "provence"] as const).map((seg) => (
-                      <button
-                        key={seg}
-                        className={`segment-btn${segmentFilter === seg ? " active" : ""}`}
-                        onClick={() => setSegmentFilter(seg)}
-                      >
-                        {seg === "all" ? "All" : seg === "paris" ? "Paris" : "Provence"}
-                      </button>
-                    ))}
-                  </div>
+                <div className="segment-toggle">
+                  {(["all", "paris", "provence"] as const).map((seg) => (
+                    <button
+                      key={seg}
+                      className={`segment-btn${segmentFilter === seg ? " active" : ""}`}
+                      onClick={() => setSegmentFilter(seg)}
+                    >
+                      {seg === "all" ? "All" : seg === "paris" ? "Paris" : "Provence"}
+                    </button>
+                  ))}
                 </div>
 
                 <div>
@@ -708,10 +711,6 @@ export default function App() {
                   </div>
                 ))}
               </div>
-            </>
-          ) : (
-            <ItineraryView onDayClick={(lat, lng) => setSelectedId(null)} />
-          )}
         </aside>
 
         <div className="map-container">
@@ -758,6 +757,7 @@ export default function App() {
                 scaleControl={false}
                 style={{ width: "100%", height: "100%" }}
               >
+                <MapPanHandler selectedId={selectedId} places={filtered} />
                 <MyLocationButton />
                 <TransitLayer visible={showTransit} />
                 <ArrondissementLayer visible={showArrondissements} />
@@ -784,10 +784,13 @@ export default function App() {
           )}
         </div>
       </div>
+      )}
 
-      <button className="mobile-toggle" onClick={() => setShowList(!showList)}>
-        {showList ? "Show Map" : "Show List"}
-      </button>
+      {view === "places" && (
+        <button className="mobile-toggle" onClick={() => setShowList(!showList)}>
+          {showList ? "Show Map" : "Show List"}
+        </button>
+      )}
     </div>
   );
 }
