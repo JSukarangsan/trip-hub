@@ -15,6 +15,7 @@ import {
   type Category,
 } from "./data/places";
 import { igPlaces } from "./data/ig-places";
+import { phrases, neighborhoods } from "./data/daily-content";
 import sheetPlacesRaw from "./data/sheet-places.json";
 import { itinerary, segmentColor, isToday } from "./data/itinerary";
 import "./App.css";
