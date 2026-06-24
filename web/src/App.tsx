@@ -1,0 +1,793 @@
+import { useState, useMemo, useCallback, useEffect } from "react";
+import {
+  APIProvider,
+  Map,
+  AdvancedMarker,
+  InfoWindow,
+  useMap,
+} from "@vis.gl/react-google-maps";
+import {
+  places as basePlaces,
+  CATEGORY_LABELS,
+  CATEGORY_COLORS,
+  APARTMENT_COORDS,
+  type Place,
+  type Category,
+} from "./data/places";
+import { igPlaces } from "./data/ig-places";
+import { getTodaysPhrase, getTodaysNeighborhood } from "./data/daily-content";
+import { itinerary, segmentColor, isToday } from "./data/itinerary";
+import "./App.css";
+
+const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+const MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID || "";
+
+const allPlaces: Place[] = [...basePlaces, ...igPlaces];
+
+type DistanceFilter = "all" | "walk" | "nearby" | "metro" | "daytrip";
+
+const DISTANCE_OPTIONS: { value: DistanceFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "walk", label: "Walking" },
+  { value: "nearby", label: "Nearby" },
+  { value: "metro", label: "Metro" },
+  { value: "daytrip", label: "Day trip" },
+];
+
+function classifyDistance(d: string): DistanceFilter {
+  const lower = d.toLowerCase();
+  if (lower.includes("home") || lower.includes("0 min")) return "walk";
+  if (lower.includes("walk") && !lower.includes("20") && !lower.includes("25") && !lower.includes("28") && !lower.includes("30"))
+    return "walk";
+  if (lower.includes("walk")) return "nearby";
+  if (lower.includes("provence")) return "daytrip";
+  if (lower.includes("rer") || lower.includes("train") || lower.includes("45") || lower.includes("60") || lower.includes("75"))
+    return "daytrip";
+  if (lower.includes("metro") || lower.includes("min")) return "metro";
+  return "metro";
+}
+
+function getDaysUntilTrip(): number {
+  const departure = new Date(2026, 6, 17); // July 17, 2026
+  const now = new Date();
+  return Math.ceil((departure.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function useZoom() {
+  const map = useMap();
+  const [zoom, setZoom] = useState(13);
+  useEffect(() => {
+    if (!map) return;
+    const listener = map.addListener("zoom_changed", () => {
+      setZoom(map.getZoom() ?? 13);
+    });
+    setZoom(map.getZoom() ?? 13);
+    return () => listener.remove();
+  }, [map]);
+  return zoom;
+}
+
+function pinSize(zoom: number, isSelected: boolean): number {
+  let base: number;
+  if (zoom <= 11) base = 10;
+  else if (zoom <= 12) base = 14;
+  else if (zoom <= 14) base = 20;
+  else base = 24;
+  return isSelected ? base + 8 : base;
+}
+
+function MyLocationButton() {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+    const controls = map.controls[google.maps.ControlPosition.RIGHT_BOTTOM];
+    // Prevent duplicates on hot reload
+    if (controls.getLength() > 0) return;
+
+    const btn = document.createElement("button");
+    btn.title = "My location";
+    btn.style.cssText =
+      "background:#fff;border:none;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.3);width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 10px 10px 0;";
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>`;
+    btn.addEventListener("mouseover", () => (btn.style.background = "#f5f5f5"));
+    btn.addEventListener("mouseout", () => (btn.style.background = "#fff"));
+    btn.addEventListener("click", () => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          map.setZoom(15);
+        },
+        () => alert("Could not get your location"),
+        { enableHighAccuracy: true }
+      );
+    });
+    controls.push(btn);
+  }, [map]);
+
+  return null;
+}
+
+function ArrondissementLayer({ visible }: { visible: boolean }) {
+  const map = useMap();
+  const zoom = useZoom();
+  const [labels, setLabels] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
+
+  // Load/unload GeoJSON and labels
+  useEffect(() => {
+    if (!map) return;
+
+    labels.forEach((l) => (l.map = null));
+    setLabels([]);
+    map.data.forEach((f) => map.data.remove(f));
+    google.maps.event.clearListeners(map.data, "mouseover");
+    google.maps.event.clearListeners(map.data, "mouseout");
+
+    if (!visible) return;
+
+    const newLabels: google.maps.marker.AdvancedMarkerElement[] = [];
+
+    map.data.loadGeoJson("/paris-arrondissements.geojson", undefined, (features) => {
+      features.forEach((feature) => {
+        const id = feature.getProperty("cartodb_id") as number;
+        const name = feature.getProperty("name") as string;
+        const geo = feature.getGeometry();
+        if (!geo) return;
+
+        let latSum = 0, lngSum = 0, count = 0;
+        geo.forEachLatLng((ll) => { latSum += ll.lat(); lngSum += ll.lng(); count++; });
+        const center = { lat: latSum / count, lng: lngSum / count };
+
+        const el = document.createElement("div");
+        el.className = "arr-label";
+        el.innerHTML = `<span class="arr-num">${id}e</span><span class="arr-name">${name}</span>`;
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          position: center,
+          map,
+          content: el,
+          zIndex: 0,
+        });
+        newLabels.push(marker);
+      });
+      setLabels(newLabels);
+    });
+
+    map.data.setStyle({
+      fillColor: "#1e3a5f",
+      fillOpacity: 0.04,
+      strokeColor: "#1e3a5f",
+      strokeWeight: 1.5,
+      strokeOpacity: 0.5,
+    });
+
+    map.data.addListener("mouseover", (e: google.maps.Data.MouseEvent) => {
+      map.data.overrideStyle(e.feature, {
+        fillColor: "#c4a35a",
+        fillOpacity: 0.2,
+        strokeColor: "#c4a35a",
+        strokeWeight: 3,
+        strokeOpacity: 0.9,
+      });
+    });
+    map.data.addListener("mouseout", (e: google.maps.Data.MouseEvent) => {
+      map.data.revertStyle(e.feature);
+    });
+
+    return () => {
+      newLabels.forEach((l) => (l.map = null));
+      map.data.forEach((f) => map.data.remove(f));
+      google.maps.event.clearListeners(map.data, "mouseover");
+      google.maps.event.clearListeners(map.data, "mouseout");
+    };
+  }, [map, visible]);
+
+  // Show/hide labels based on zoom
+  useEffect(() => {
+    const showLabels = zoom >= 13;
+    labels.forEach((l) => {
+      if (l.content instanceof HTMLElement) {
+        l.content.style.display = showLabels ? "" : "none";
+      }
+    });
+  }, [zoom, labels]);
+
+  return null;
+}
+
+function TransitLayer({ visible }: { visible: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map) return;
+    const transitLayer = new google.maps.TransitLayer();
+    if (visible) {
+      transitLayer.setMap(map);
+    }
+    return () => transitLayer.setMap(null);
+  }, [map, visible]);
+  return null;
+}
+
+interface PlaceDetails {
+  photoUrl: string | null;
+  website: string | null;
+  address: string | null;
+  googleMapsUrl: string | null;
+  openNow: boolean | null;
+  hoursText: string | null;
+  rating: number | null;
+}
+
+const EMPTY_DETAILS: PlaceDetails = {
+  photoUrl: null, website: null, address: null,
+  googleMapsUrl: null, openNow: null, hoursText: null, rating: null,
+};
+
+function usePlaceDetails(place: Place | undefined) {
+  const [details, setDetails] = useState<PlaceDetails>(EMPTY_DETAILS);
+
+  useEffect(() => {
+    if (!place) {
+      setDetails(EMPTY_DETAILS);
+      return;
+    }
+    setDetails(EMPTY_DETAILS);
+
+    async function fetchDetails() {
+      try {
+        await google.maps.importLibrary("places");
+        const request = {
+          textQuery: place!.name,
+          fields: [
+            "photos", "websiteURI", "formattedAddress", "googleMapsURI",
+            "regularOpeningHours", "rating",
+          ],
+          locationBias: {
+            center: { lat: place!.lat, lng: place!.lng },
+            radius: 500,
+          },
+          maxResultCount: 1,
+        };
+        // @ts-expect-error - searchByText is on the new Place class
+        const { places: results } = await google.maps.places.Place.searchByText(request);
+        const p = results?.[0];
+        if (!p) return;
+
+        const hours = p.regularOpeningHours;
+        let openNow: boolean | null = null;
+        let hoursText: string | null = null;
+        if (hours) {
+          openNow = hours.periods ? isOpenNow(hours.periods) : null;
+          hoursText = hours.weekdayDescriptions?.join(" | ") ?? null;
+        }
+
+        setDetails({
+          photoUrl: p.photos?.[0]?.getURI?.({ maxWidth: 400, maxHeight: 200 }) ?? null,
+          website: p.websiteURI ?? null,
+          address: p.formattedAddress ?? null,
+          googleMapsUrl: p.googleMapsURI ?? null,
+          openNow,
+          hoursText,
+          rating: p.rating ?? null,
+        });
+      } catch (e) {
+        console.log("Places detail error:", place!.name, e);
+      }
+    }
+    fetchDetails();
+  }, [place?.id]);
+
+  return details;
+}
+
+function isOpenNow(periods: Array<{ open: { hour: number; minute: number; day: number }; close?: { hour: number; minute: number; day: number } }>): boolean {
+  const now = new Date();
+  const day = now.getDay();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  for (const period of periods) {
+    if (period.open.day === day) {
+      const openMins = period.open.hour * 60 + period.open.minute;
+      const closeMins = period.close
+        ? period.close.hour * 60 + period.close.minute
+        : 24 * 60;
+      if (mins >= openMins && mins < closeMins) return true;
+    }
+  }
+  return false;
+}
+
+function MapMarkers({
+  filtered,
+  selectedId,
+  onSelect,
+}: {
+  filtered: Place[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  const map = useMap();
+  const zoom = useZoom();
+  const selectedPlace = filtered.find((p) => p.id === selectedId);
+  const details = usePlaceDetails(selectedPlace);
+
+  const handleMarkerClick = useCallback(
+    (place: Place) => {
+      onSelect(place.id);
+      map?.panTo({ lat: place.lat, lng: place.lng });
+    },
+    [map, onSelect]
+  );
+
+  return (
+    <>
+      {filtered.map((place) => {
+        const size = pinSize(zoom, selectedId === place.id);
+        return (
+        <AdvancedMarker
+          key={place.id}
+          position={{ lat: place.lat, lng: place.lng }}
+          onClick={() => handleMarkerClick(place)}
+          title={place.name}
+        >
+          <div
+            style={{
+              width: size,
+              height: size,
+              borderRadius: "50%",
+              backgroundColor: CATEGORY_COLORS[place.category],
+              border: `2px solid white`,
+              boxShadow: selectedId === place.id
+                ? `0 0 0 3px ${CATEGORY_COLORS[place.category]}`
+                : "0 1px 3px rgba(0,0,0,0.3)",
+              transition: "all 0.15s",
+            }}
+          />
+        </AdvancedMarker>
+        );
+      })}
+      {selectedPlace && (
+        <InfoWindow
+          position={{ lat: selectedPlace.lat, lng: selectedPlace.lng }}
+          onCloseClick={() => onSelect(null)}
+          pixelOffset={[0, -10]}
+        >
+          <div style={{ fontFamily: "Inter, -apple-system, sans-serif", maxWidth: 300 }}>
+            {details.photoUrl && (
+              <img
+                src={details.photoUrl}
+                alt={selectedPlace.name}
+                style={{
+                  width: "100%",
+                  height: 160,
+                  objectFit: "cover",
+                  borderRadius: 6,
+                  marginBottom: 8,
+                }}
+              />
+            )}
+            <div
+              style={{
+                fontSize: "0.7rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontWeight: 600,
+                color: CATEGORY_COLORS[selectedPlace.category],
+                marginBottom: 2,
+              }}
+            >
+              {CATEGORY_LABELS[selectedPlace.category]}
+            </div>
+            <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 4, color: "#0d1b3e" }}>
+              {selectedPlace.name}
+            </h3>
+            {details.rating && (
+              <div style={{ fontSize: "0.8rem", color: "#c4a35a", fontWeight: 600, marginBottom: 4 }}>
+                {"★".repeat(Math.round(details.rating))}{"☆".repeat(5 - Math.round(details.rating))} {details.rating}
+              </div>
+            )}
+            {details.address && (
+              <p style={{ fontSize: "0.8rem", color: "#4a4a6a", margin: "4px 0" }}>
+                {details.address}
+              </p>
+            )}
+            {details.openNow !== null && (
+              <details style={{ fontSize: "0.8rem", margin: "4px 0" }}>
+                <summary style={{ cursor: "pointer", listStyle: "none", display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ color: details.openNow ? "#27ae60" : "#c8374d", fontWeight: 600 }}>
+                    {details.openNow ? "Open now" : "Closed"}
+                  </span>
+                  {details.hoursText && <span style={{ fontSize: "0.75rem", color: "#8888a0" }}>▾ Hours</span>}
+                </summary>
+                {details.hoursText && (
+                  <div style={{ fontSize: "0.75rem", color: "#8888a0", marginTop: 4, paddingLeft: 4, lineHeight: 1.6 }}>
+                    {details.hoursText.split(" | ").map((day, i) => (
+                      <div key={i}>{day}</div>
+                    ))}
+                  </div>
+                )}
+              </details>
+            )}
+            <p style={{ fontSize: "0.8rem", color: "#4a4a6a", margin: "4px 0" }}>
+              {selectedPlace.notes}
+            </p>
+            <div style={{ display: "flex", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
+              {details.googleMapsUrl && (
+                <a
+                  href={details.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: "0.8rem", color: "#1a73e8", textDecoration: "none", fontWeight: 500 }}
+                >
+                  Google Maps
+                </a>
+              )}
+              {details.website && (
+                <a
+                  href={details.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: "0.8rem", color: "#1a73e8", textDecoration: "none", fontWeight: 500 }}
+                >
+                  Website
+                </a>
+              )}
+            </div>
+          </div>
+        </InfoWindow>
+      )}
+    </>
+  );
+}
+
+function useLiveClocks() {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const fmt = (tz: string) =>
+    now.toLocaleTimeString("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit", hour12: true })
+      .replace(" AM", "a").replace(" PM", "p");
+  return { la: fmt("America/Los_Angeles"), ny: fmt("America/New_York"), paris: fmt("Europe/Paris") };
+}
+
+function TodayCard() {
+  const [open, setOpen] = useState(false);
+  const phrase = getTodaysPhrase();
+  const hood = getTodaysNeighborhood();
+  return (
+    <div className="today-card" onClick={() => setOpen(!open)}>
+      <div className="today-summary">
+        <span className="today-label">Aujourd'hui</span>
+        <span className="today-preview">
+          {phrase.french} &middot; {hood.arrondissement} {hood.name}
+        </span>
+        <span className="today-chevron">{open ? "\u25B4" : "\u25BE"}</span>
+      </div>
+      {open && (
+        <div className="today-details">
+          <div className="today-section">
+            <div className="today-section-label">Phrase du jour</div>
+            <div className="today-phrase-french">{phrase.french}</div>
+            <div className="today-phrase-pron">{phrase.pronunciation}</div>
+            <div className="today-phrase-eng">{phrase.english}</div>
+            <div className="today-phrase-ctx">{phrase.context}</div>
+          </div>
+          <div className="today-section">
+            <div className="today-section-label">Quartier du jour</div>
+            <div className="today-hood-name">{hood.arrondissement} &mdash; {hood.name}</div>
+            <div className="today-hood-tip">{hood.tip}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ItineraryView({ onDayClick }: { onDayClick: (lat: number, lng: number) => void }) {
+  const todayIdx = itinerary.findIndex((d) => isToday(d.date));
+  return (
+    <div className="itinerary-list">
+      {itinerary.map((day, i) => {
+        const today = isToday(day.date);
+        return (
+          <div
+            key={day.date}
+            className={`itinerary-day${today ? " today" : ""}`}
+            onClick={() => onDayClick(day.lodgingLat, day.lodgingLng)}
+            ref={today ? (el) => el?.scrollIntoView({ block: "center" }) : undefined}
+          >
+            <div className="itin-header">
+              <span className="itin-date">
+                {new Date(day.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </span>
+              <span className="itin-dow">{day.dayOfWeek}</span>
+              <span className="itin-segment" style={{ backgroundColor: segmentColor(day.segment) }}>
+                {day.segment}
+              </span>
+              {day.jessSchedule && (
+                <span className={`itin-jess ${day.jessSchedule === "Working" ? "working" : ""}`}>
+                  {day.jessSchedule === "Working" ? "Jess working" : day.jessSchedule === "PTO" ? "Jess PTO" : day.jessSchedule}
+                </span>
+              )}
+            </div>
+            <div className="itin-lodging">{day.lodging}</div>
+            {day.activities && <div className="itin-activities">{day.activities}</div>}
+            {day.meals && <div className="itin-meals">{day.meals}</div>}
+            {day.notes && <div className="itin-notes">{day.notes}</div>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function App() {
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<Category | "all">("all");
+  const [distanceFilter, setDistanceFilter] = useState<DistanceFilter>("all");
+  const [segmentFilter, setSegmentFilter] = useState<"all" | "paris" | "provence">("all");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showList, setShowList] = useState(true);
+  const [showTransit, setShowTransit] = useState(false);
+  const [showArrondissements, setShowArrondissements] = useState(false);
+  const [activeTab, setActiveTab] = useState<"places" | "itinerary">("places");
+
+  const daysLeft = getDaysUntilTrip();
+  const clocks = useLiveClocks();
+
+  const categories = useMemo(() => {
+    const cats = new Set(allPlaces.map((p) => p.category));
+    return Array.from(cats).sort();
+  }, []);
+
+  const filtered = useMemo(() => {
+    return allPlaces.filter((place) => {
+      if (categoryFilter !== "all" && place.category !== categoryFilter) return false;
+      if (segmentFilter !== "all" && place.segment !== segmentFilter) return false;
+      if (distanceFilter !== "all" && classifyDistance(place.distanceFromApt) !== distanceFilter)
+        return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return (
+          place.name.toLowerCase().includes(q) ||
+          place.notes.toLowerCase().includes(q) ||
+          place.address.toLowerCase().includes(q) ||
+          (place.metro && place.metro.toLowerCase().includes(q))
+        );
+      }
+      return true;
+    });
+  }, [search, categoryFilter, distanceFilter, segmentFilter]);
+
+  const defaultCenter = useMemo(() => {
+    if (segmentFilter === "provence") return { lat: 43.85, lng: 5.1 };
+    return APARTMENT_COORDS;
+  }, [segmentFilter]);
+
+  const defaultZoom = segmentFilter === "provence" ? 10 : 13;
+
+  return (
+    <div className="app">
+      <header className="header">
+        <div className="header-left">
+          <div>
+            <h1>France 2026</h1>
+            <span className="subtitle">Trip Hub</span>
+          </div>
+        </div>
+        <div className="header-right">
+          <span className="header-clocks">
+            LA {clocks.la} &middot; NY {clocks.ny} &middot; Paris {clocks.paris}
+          </span>
+          {daysLeft > 0 && <span className="countdown">{daysLeft}d to go</span>}
+          {daysLeft <= 0 && daysLeft > -42 && <span className="countdown">Bon voyage!</span>}
+        </div>
+      </header>
+
+      <div className="main">
+        <aside className={`sidebar${!showList ? " hidden-mobile" : ""}`}>
+          <div className="sidebar-tabs">
+            <button
+              className={`sidebar-tab${activeTab === "places" ? " active" : ""}`}
+              onClick={() => setActiveTab("places")}
+            >
+              Places
+            </button>
+            <button
+              className={`sidebar-tab${activeTab === "itinerary" ? " active" : ""}`}
+              onClick={() => setActiveTab("itinerary")}
+            >
+              Itinerary
+            </button>
+          </div>
+
+          <TodayCard />
+
+          {activeTab === "places" ? (
+            <>
+              <div className="filters">
+                <input
+                  className="search-input"
+                  type="text"
+                  placeholder="Search places..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+
+                <div>
+                  <div className="filter-section-label" style={{ marginBottom: 6 }}>Region</div>
+                  <div className="segment-toggle">
+                    {(["all", "paris", "provence"] as const).map((seg) => (
+                      <button
+                        key={seg}
+                        className={`segment-btn${segmentFilter === seg ? " active" : ""}`}
+                        onClick={() => setSegmentFilter(seg)}
+                      >
+                        {seg === "all" ? "All" : seg === "paris" ? "Paris" : "Provence"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="filter-section-label" style={{ marginBottom: 6 }}>Category</div>
+                  <div className="filter-row">
+                    <button
+                      className={`filter-chip${categoryFilter === "all" ? " active" : ""}`}
+                      onClick={() => setCategoryFilter("all")}
+                    >
+                      All
+                    </button>
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        className={`filter-chip${categoryFilter === cat ? " active" : ""}`}
+                        onClick={() => setCategoryFilter(categoryFilter === cat ? "all" : cat)}
+                        style={
+                          categoryFilter === cat
+                            ? { background: CATEGORY_COLORS[cat], borderColor: CATEGORY_COLORS[cat] }
+                            : {}
+                        }
+                      >
+                        {categoryFilter !== cat && (
+                          <span className="chip-dot" style={{ backgroundColor: CATEGORY_COLORS[cat] }} />
+                        )}
+                        {CATEGORY_LABELS[cat]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="filter-section-label" style={{ marginBottom: 6 }}>Distance</div>
+                  <div className="distance-filters">
+                    {DISTANCE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        className={`filter-chip${distanceFilter === opt.value ? " active" : ""}`}
+                        onClick={() => setDistanceFilter(opt.value)}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="place-count">
+                {filtered.length} place{filtered.length !== 1 ? "s" : ""}
+              </div>
+
+              <div className="place-list">
+                {filtered.map((place) => (
+                  <div
+                    key={place.id}
+                    className={`place-card${selectedId === place.id ? " selected" : ""}`}
+                    onClick={() => setSelectedId(selectedId === place.id ? null : place.id)}
+                  >
+                    <div
+                      className="place-dot"
+                      style={{ backgroundColor: CATEGORY_COLORS[place.category] }}
+                    />
+                    <div className="place-info">
+                      <div className="place-name">{place.name}</div>
+                      <div className="place-meta">
+                        <span
+                          className="place-category-badge"
+                          style={{ backgroundColor: CATEGORY_COLORS[place.category] }}
+                        >
+                          {CATEGORY_LABELS[place.category]}
+                        </span>
+                        <span className="place-distance">{place.distanceFromApt}</span>
+                        {place.rating && <span className="place-rating">{place.rating}</span>}
+                      </div>
+                      <div className="place-notes">{place.notes}</div>
+                      {place.pricing && <div className="place-pricing">{place.pricing}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <ItineraryView onDayClick={(lat, lng) => setSelectedId(null)} />
+          )}
+        </aside>
+
+        <div className="map-container">
+          {API_KEY ? (
+            <APIProvider apiKey={API_KEY} libraries={["places"]}>
+              <div className="map-controls">
+                <button
+                  className={`map-layer-btn${showTransit ? " active" : ""}`}
+                  onClick={() => setShowTransit(!showTransit)}
+                  title="Toggle transit lines"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="3" width="16" height="18" rx="2" />
+                    <path d="M12 17v.01" />
+                    <path d="M8 21h8" />
+                    <path d="M12 21v-4" />
+                    <path d="M4 11h16" />
+                  </svg>
+                  Transit
+                </button>
+                <button
+                  className={`map-layer-btn${showArrondissements ? " active" : ""}`}
+                  onClick={() => setShowArrondissements(!showArrondissements)}
+                  title="Toggle arrondissement borders"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="12" y1="3" x2="12" y2="21" />
+                  </svg>
+                  Arrondissements
+                </button>
+              </div>
+              <Map
+                defaultCenter={defaultCenter}
+                defaultZoom={defaultZoom}
+                mapId={MAP_ID}
+                gestureHandling="greedy"
+                disableDefaultUI={false}
+                mapTypeControl={false}
+                zoomControl={true}
+                streetViewControl={true}
+                fullscreenControl={false}
+                scaleControl={false}
+                style={{ width: "100%", height: "100%" }}
+              >
+                <MyLocationButton />
+                <TransitLayer visible={showTransit} />
+                <ArrondissementLayer visible={showArrondissements} />
+                <MapMarkers
+                  filtered={filtered}
+                  selectedId={selectedId}
+                  onSelect={setSelectedId}
+                />
+              </Map>
+            </APIProvider>
+          ) : (
+            <div className="no-api-key">
+              <h2>Map Setup Required</h2>
+              <p>Add your Google Maps API key to get the interactive map:</p>
+              <code>VITE_GOOGLE_MAPS_API_KEY=your_key_here</code>
+              <p style={{ marginTop: 12, fontSize: "0.8rem", color: "#8888a0" }}>
+                Create a <code style={{ display: "inline", padding: "2px 4px", margin: 0 }}>.env.local</code> file in the web/ directory.
+              </p>
+              <p style={{ marginTop: 4, fontSize: "0.8rem", color: "#8888a0" }}>
+                You also need a Map ID for Advanced Markers:
+              </p>
+              <code>VITE_GOOGLE_MAP_ID=your_map_id</code>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <button className="mobile-toggle" onClick={() => setShowList(!showList)}>
+        {showList ? "Show Map" : "Show List"}
+      </button>
+    </div>
+  );
+}

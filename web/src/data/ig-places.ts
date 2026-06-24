@@ -1,0 +1,343 @@
+import type { Place } from "./places";
+
+export const igPlaces: Place[] = [
+  // === RESTAURANTS ===
+  {
+    id: "ig-mam-from-hanoi",
+    name: "Mam From Hanoi",
+    category: "restaurant",
+    address: "39 Rue de Clery, 75002 Paris",
+    lat: 48.8686763,
+    lng: 2.3483565,
+    distanceFromApt: "25 min metro",
+    notes:
+      "Vietnamese restaurant specializing in Northern pho. Michelin-recognized. Make reservations ASAP. Via @foodfindsryan",
+    segment: "paris",
+  },
+  {
+    id: "ig-brasserie-martin",
+    name: "Brasserie Martin",
+    category: "restaurant",
+    address: "Rue Saint-Ambroise, 75011 Paris",
+    lat: 48.8626445,
+    lng: 2.3786484,
+    distanceFromApt: "30 min metro",
+    notes:
+      "Classic Parisian brasserie in the 11e. Featured in best restaurants in Paris list. Via @maddiemclark",
+    segment: "paris",
+  },
+  {
+    id: "ig-early-june",
+    name: "Early June",
+    category: "restaurant",
+    address: "Rue Jean Poulmarch, 75010 Paris",
+    lat: 48.8729295,
+    lng: 2.3632635,
+    distanceFromApt: "30 min metro",
+    notes:
+      "Wine bar near Canal St Martin. From Dua Lipa's Paris guide. Via @mattconcierge",
+    segment: "paris",
+  },
+  {
+    id: "ig-the-hood",
+    name: "The Hood",
+    category: "restaurant",
+    address: "Rue de l'Ouest, 75014 Paris",
+    lat: 48.833898,
+    lng: 2.3154421,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Creative cafe-restaurant with modern Singaporean flavours. Part of Paris's rising Asian dining scene. Via @roadbook",
+    segment: "paris",
+  },
+  {
+    id: "ig-cafe-1902-petit-palais",
+    name: "Cafe 1902 at Petit Palais",
+    category: "restaurant",
+    address: "Avenue Winston Churchill, 75008 Paris",
+    lat: 48.866042,
+    lng: 2.3153496,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Stunning cafe inside Petit Palais museum. Garden courtyard with fountain. Serene oasis near Champs-Elysees. Via @pariscafeproject",
+    segment: "paris",
+  },
+  {
+    id: "ig-bistrot-paul-bert",
+    name: "Bistrot Paul Bert",
+    category: "restaurant",
+    address: "Rue Paul Bert, 75011 Paris",
+    lat: 48.852223,
+    lng: 2.3849242,
+    distanceFromApt: "30 min metro",
+    notes:
+      "Classic bistrot, famous for steak au poivre. Top 10 bites in Paris. Via @eat_this_",
+    segment: "paris",
+  },
+  {
+    id: "ig-riverose-paris",
+    name: "Riverose Paris",
+    category: "restaurant",
+    address: "68 Avenue de New York, 75016 Paris",
+    lat: 48.8581532,
+    lng: 2.2878913,
+    distanceFromApt: "5 min walk",
+    notes:
+      "Brunch spot right in front of the Eiffel Tower. Ultra-indulgent dishes and colorful drinks. Via @riveroseparis",
+    segment: "paris",
+  },
+  {
+    id: "ig-fabula",
+    name: "Fabula",
+    category: "restaurant",
+    address: "Rue de Charenton, 75012 Paris",
+    lat: 48.8506326,
+    lng: 2.3732696,
+    distanceFromApt: "30 min metro",
+    notes:
+      "Cafe-restaurant near Le Marais. Via @mia.in.france",
+    segment: "paris",
+  },
+  {
+    id: "ig-onyx-restaurant",
+    name: "Onyx Restaurant Paris",
+    category: "restaurant",
+    address: "71 Rue de Provence, 75009 Paris",
+    lat: 48.8742148,
+    lng: 2.3324573,
+    distanceFromApt: "25 min metro",
+    notes:
+      "Elevated lunch menu. Fine dining in the 9e. Via @seb_hed",
+    segment: "paris",
+  },
+  {
+    id: "ig-sugaar",
+    name: "Sugaar",
+    category: "restaurant",
+    address: "Rue Gozlin, 75006 Paris",
+    lat: 48.8533621,
+    lng: 2.3336787,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Basque steakhouse in Saint-Germain. Recommended by Dua Lipa in Tatler Travel guide. Via @tatlertravel",
+    segment: "paris",
+  },
+  {
+    id: "ig-le-jardin-du-petit-palais",
+    name: "Cafe-Restaurant Le Jardin du Petit Palais",
+    category: "restaurant",
+    address: "Avenue Winston Churchill, 75008 Paris",
+    lat: 48.866042,
+    lng: 2.3153496,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Garden courtyard cafe inside Petit Palais. Fountain and museum views. A hidden quiet spot. Via @ang.and.chris",
+    segment: "paris",
+  },
+  {
+    id: "ig-rotisserie-segar",
+    name: "Rotisserie Segar",
+    category: "restaurant",
+    address: "Rue Mouffetard, 75005 Paris",
+    lat: 48.8405594,
+    lng: 2.3497771,
+    distanceFromApt: "25 min metro",
+    notes:
+      "Famous rotisserie chicken caesar sandwich on Rue Mouffetard. Via @jacksdiningroom",
+    segment: "paris",
+  },
+  {
+    id: "ig-rori",
+    name: "RORI",
+    category: "restaurant",
+    address: "96 Rue Jean-Pierre Timbaud, 75011 Paris",
+    lat: 48.867761,
+    lng: 2.3780632,
+    distanceFromApt: "30 min metro",
+    notes:
+      "Kid-friendly pizza spot. The Red Pie is a favorite. Great for a quick pizza break with Sloane. Via @fanny__petit",
+    segment: "paris",
+  },
+  {
+    id: "ig-verlet-paris",
+    name: "Verlet Paris",
+    category: "restaurant",
+    address: "Rue Saint-Honore, 75001 Paris",
+    lat: 48.8641109,
+    lng: 2.3338964,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Historic coffee house near Palais Royal. One of Paris's treasure spots. Via @studiocartashop",
+    segment: "paris",
+  },
+
+  // === MARKETS & FOOD HALLS ===
+  {
+    id: "ig-la-grande-epicerie",
+    name: "La Grande Epicerie de Paris",
+    category: "market",
+    address: "Rue de Sevres, 75007 Paris",
+    lat: 48.850004,
+    lng: 2.3232825,
+    distanceFromApt: "15 min metro",
+    notes:
+      "Legendary gourmet food hall at Le Bon Marche. Over 100 years old. Clean ingredients, whole foods, artisanal products. Via @thehapawellness",
+    segment: "paris",
+  },
+  {
+    id: "ig-marche-enfants-rouges",
+    name: "Marche des Enfants Rouges",
+    category: "market",
+    address: "Rue Charlot, 75003 Paris",
+    lat: 48.8627951,
+    lng: 2.361973,
+    distanceFromApt: "25 min metro",
+    notes:
+      "Paris's oldest food market, 400 years old. Amazing variety of prepared food stalls. Via @eatingwithtod",
+    segment: "paris",
+  },
+
+  // === BAKERIES & FOOD SHOPS ===
+  {
+    id: "ig-maille-paris",
+    name: "Maille Paris",
+    category: "market",
+    address: "Place de la Madeleine, 75008 Paris",
+    lat: 48.8689479,
+    lng: 2.3244745,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Iconic mustard and condiment boutique on Place de la Madeleine. Great souvenir spot. Via @baochitravel",
+    segment: "paris",
+  },
+
+  // === MUSEUMS ===
+  {
+    id: "ig-musee-carnavalet",
+    name: "Musee Carnavalet",
+    category: "museum",
+    address: "Rue des Francs Bourgeois, 75004 Paris",
+    lat: 48.8573232,
+    lng: 2.3624734,
+    distanceFromApt: "25 min metro",
+    notes:
+      "Free Paris history museum in Le Marais. Beautiful courtyard. Via @marigladkaya",
+    segment: "paris",
+  },
+  {
+    id: "ig-musee-rodin",
+    name: "Musee Rodin",
+    category: "museum",
+    address: "77 Rue de Varenne, 75007 Paris",
+    lat: 48.8547473,
+    lng: 2.315867,
+    distanceFromApt: "15 min metro",
+    notes:
+      "Sunlit rooms and romantic sculpture gardens. One of the most magical spots in Paris. Via @rileejsmith",
+    segment: "paris",
+  },
+  {
+    id: "ig-dior-museum",
+    name: "Dior Museum",
+    category: "museum",
+    address: "30 Avenue Montaigne, 75008 Paris",
+    lat: 48.8666928,
+    lng: 2.3061198,
+    distanceFromApt: "15 min metro",
+    notes:
+      "La Galerie Dior. EUR 16 entry. Great for a bestie day out. Via @toniscaglione",
+    segment: "paris",
+  },
+
+  // === PARKS ===
+  {
+    id: "ig-parc-monceau",
+    name: "Parc Monceau",
+    category: "park",
+    address: "Parc Monceau, 75008 Paris",
+    lat: 48.879374,
+    lng: 2.3088732,
+    distanceFromApt: "25 min metro",
+    notes:
+      "Romantic, hidden-garden feel. Less structured than other Paris parks. Fantasy landscape with historic fragments. Via @toniscaglione",
+    segment: "paris",
+  },
+  {
+    id: "ig-ile-de-reuilly",
+    name: "Ile de Reuilly",
+    category: "park",
+    address: "Avenue des Terroirs de France, 75012 Paris",
+    lat: 48.8305595,
+    lng: 2.386129,
+    distanceFromApt: "30 min metro",
+    notes:
+      "Hidden Paris gem in the 12e. A side of Paris most people never see. Via @kianaatravel",
+    segment: "paris",
+  },
+
+  // === PILATES & YOGA ===
+  {
+    id: "ig-burning-bar",
+    name: "Burning Bar Paris",
+    category: "pilates",
+    address: "42 Avenue Raymond Poincare, 75016 Paris",
+    lat: 48.8664203,
+    lng: 2.2859668,
+    distanceFromApt: "15 min metro",
+    notes:
+      "Hot yoga and pilates studio. Luxe self-care and fitness experience. Via @maddiemclark",
+    segment: "paris",
+  },
+
+  // === ATTRACTIONS ===
+  {
+    id: "ig-guignol-puppet-theatre",
+    name: "Guignol Puppet Theatre",
+    category: "attraction",
+    address: "Jardin d'Acclimatation, Bois de Boulogne, 75016 Paris",
+    lat: 48.8778648,
+    lng: 2.2605764,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Iconic French puppet theatre, 200+ years old. Beloved way to introduce kids to theatre. Great for Sloane. Via @americanmominparis",
+    segment: "paris",
+  },
+  {
+    id: "ig-saint-eustache",
+    name: "Saint-Eustache Church",
+    category: "attraction",
+    address: "Place Rene Cassin, 75001 Paris",
+    lat: 48.8633997,
+    lng: 2.3451276,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Immersive light experience inside the church. Free. Near Les Halles. Via @dayoneinparis",
+    segment: "paris",
+  },
+  {
+    id: "ig-bonhomme-de-bois",
+    name: "Bonhomme de Bois",
+    category: "attraction",
+    address: "Quartier de la Madeleine, 75008 Paris",
+    lat: 48.8739228,
+    lng: 2.3202251,
+    distanceFromApt: "20 min metro",
+    notes:
+      "Classic Parisian toy shop. Great for kids. Via @littlegeneralkids",
+    segment: "paris",
+  },
+
+  // === PROVENCE ===
+  {
+    id: "ig-airelles-gordes",
+    name: "Airelles Gordes, La Bastide",
+    category: "restaurant",
+    address: "61 Rue de la Combe, Gordes 84220",
+    lat: 43.9112253,
+    lng: 5.198868,
+    distanceFromApt: "Provence",
+    notes:
+      "Luxury hotel restaurant above Gordes village. Featured in Emily in Paris. 2.5 hrs from Paris by train. Via @theluxurywifestyle",
+    segment: "provence",
+  },
+];
