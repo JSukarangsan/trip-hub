@@ -677,6 +677,76 @@ function SavedCollectionPage() {
   );
 }
 
+function PhraseTray() {
+  const [open, setOpen] = useState(false);
+  const [idx, setIdx] = useState(() => {
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    return dayOfYear % phrases.length;
+  });
+  const phrase = phrases[idx];
+  const prev = () => setIdx((idx - 1 + phrases.length) % phrases.length);
+  const next = () => setIdx((idx + 1) % phrases.length);
+  return (
+    <div className="today-tray-wrap">
+      <button className="today-trigger phrase-trigger" onClick={() => setOpen(!open)}>
+        Phrase du jour
+      </button>
+      {open && (
+        <>
+          <div className="today-backdrop" onClick={() => setOpen(false)} />
+          <div className="today-tray">
+            <div className="tray-nav">
+              <button className="tray-arrow" onClick={prev}>&larr;</button>
+              <span className="tray-counter">{idx + 1} / {phrases.length}</span>
+              <button className="tray-arrow" onClick={next}>&rarr;</button>
+            </div>
+            <div className="today-section">
+              <div className="today-phrase-french">{phrase.french}</div>
+              <div className="today-phrase-pron">{phrase.pronunciation}</div>
+              <div className="today-phrase-eng">{phrase.english}</div>
+              <div className="today-phrase-ctx">{phrase.context}</div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function NeighborhoodTray() {
+  const [open, setOpen] = useState(false);
+  const [idx, setIdx] = useState(() => {
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    return dayOfYear % neighborhoods.length;
+  });
+  const hood = neighborhoods[idx];
+  const prev = () => setIdx((idx - 1 + neighborhoods.length) % neighborhoods.length);
+  const next = () => setIdx((idx + 1) % neighborhoods.length);
+  return (
+    <div className="today-tray-wrap">
+      <button className="today-trigger hood-trigger" onClick={() => setOpen(!open)}>
+        Quartier du jour
+      </button>
+      {open && (
+        <>
+          <div className="today-backdrop" onClick={() => setOpen(false)} />
+          <div className="today-tray">
+            <div className="tray-nav">
+              <button className="tray-arrow" onClick={prev}>&larr;</button>
+              <span className="tray-counter">{idx + 1} / {neighborhoods.length}</span>
+              <button className="tray-arrow" onClick={next}>&rarr;</button>
+            </div>
+            <div className="today-section">
+              <div className="today-hood-name">{hood.arrondissement} &mdash; {hood.name}</div>
+              <div className="today-hood-tip">{hood.tip}</div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [categoryFilter, setCategoryFilter] = useState<Category | "all">("all");
   const [distanceFilter, setDistanceFilter] = useState<DistanceFilter>("all");
