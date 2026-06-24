@@ -53,7 +53,7 @@ export const CATEGORY_COLORS: Record<Category, string> = {
   shopping: "#9b59b6",
 };
 
-export const APARTMENT_COORDS = { lat: 48.8534, lng: 2.2867 }; // Bir-Hakeim / Grenelle area
+export const APARTMENT_COORDS = { lat: 48.8537, lng: 2.2891 }; // Bir-Hakeim / Grenelle area
 
 export const places: Place[] = [
   // === LODGING ===
@@ -72,7 +72,7 @@ export const places: Place[] = [
     id: "lodging-ukio",
     name: "Ukio Tular 1979",
     category: "lodging",
-    address: "Boulevard de Grenelle, 15e, Paris 75015",
+    address: "6 Boulevard de Grenelle, 75015 Paris",
     lat: 48.8534,
     lng: 2.2867,
     distanceFromApt: "Home base",

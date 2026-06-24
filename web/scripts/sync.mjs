@@ -119,10 +119,11 @@ async function main() {
 
     const cached = cacheByName.get(name.toLowerCase());
     if (cached) {
-      // Update metadata from sheet but keep geocoded data
+      // Sheet data takes priority over cached/geocoded data
       results.push({
         ...cached,
-        category: normalizeCategory(row.Category || "attraction"),
+        category: normalizeCategory(row.Category || cached.category || "attraction"),
+        distanceFromApt: row["Distance from Apt"] || cached.distanceFromApt,
         notes: row.Notes || cached.notes,
         website: row.Website || cached.website,
         rating: row.Rating || cached.rating,
