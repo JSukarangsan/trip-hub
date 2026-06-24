@@ -526,7 +526,7 @@ body {
 /* ── IG Icon ── */
 .ig-icon-list {
   flex-shrink: 0;
-  opacity: 0.3;
+  opacity: 0.6;
   align-self: center;
 }
 
