@@ -237,7 +237,7 @@ function TransitLayer({ visible }: { visible: boolean }) {
 }
 
 interface PlaceDetails {
-  photoUrl: string | null;
+  photoUrls: string[];
   website: string | null;
   address: string | null;
   googleMapsUrl: string | null;
@@ -247,7 +247,7 @@ interface PlaceDetails {
 }
 
 const EMPTY_DETAILS: PlaceDetails = {
-  photoUrl: null, website: null, address: null,
+  photoUrls: [], website: null, address: null,
   googleMapsUrl: null, openNow: null, hoursText: null, rating: null,
 };
 
@@ -288,8 +288,13 @@ function usePlaceDetails(place: Place | undefined) {
           hoursText = hours.weekdayDescriptions?.join(" | ") ?? null;
         }
 
+        const photoUrls = (p.photos ?? [])
+          .slice(0, 4)
+          .map((photo: any) => photo.getURI?.({ maxWidth: 400, maxHeight: 200 }))
+          .filter(Boolean) as string[];
+
         setDetails({
-          photoUrl: p.photos?.[0]?.getURI?.({ maxWidth: 400, maxHeight: 200 }) ?? null,
+          photoUrls,
           website: p.websiteURI ?? null,
           address: p.formattedAddress ?? null,
           googleMapsUrl: p.googleMapsURI ?? null,
@@ -377,18 +382,23 @@ function MapMarkers({
           pixelOffset={[0, -10]}
         >
           <div style={{ fontFamily: "Inter, -apple-system, sans-serif", maxWidth: 300 }}>
-            {details.photoUrl && (
-              <img
-                src={details.photoUrl}
-                alt={selectedPlace.name}
-                style={{
-                  width: "100%",
-                  height: 160,
-                  objectFit: "cover",
-                  borderRadius: 6,
-                  marginBottom: 8,
-                }}
-              />
+            {details.photoUrls.length > 0 && (
+              <div style={{ display: "flex", gap: 4, overflowX: "auto", marginBottom: 8, borderRadius: 6, scrollbarWidth: "none" }}>
+                {details.photoUrls.map((url, i) => (
+                  <img
+                    key={i}
+                    src={url}
+                    alt={`${selectedPlace.name} ${i + 1}`}
+                    style={{
+                      width: details.photoUrls.length === 1 ? "100%" : 200,
+                      height: 150,
+                      objectFit: "cover",
+                      borderRadius: 6,
+                      flexShrink: 0,
+                    }}
+                  />
+                ))}
+              </div>
             )}
             <div
               style={{
