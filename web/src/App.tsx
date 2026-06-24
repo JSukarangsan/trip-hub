@@ -15,13 +15,29 @@ import {
   type Category,
 } from "./data/places";
 import { igPlaces } from "./data/ig-places";
+import sheetPlacesRaw from "./data/sheet-places.json";
 import { itinerary, segmentColor, isToday } from "./data/itinerary";
 import "./App.css";
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 const MAP_ID = import.meta.env.VITE_GOOGLE_MAP_ID || "";
 
-const allPlaces: Place[] = [...basePlaces, ...igPlaces];
+const sheetPlaces: Place[] = (sheetPlacesRaw as Place[]).filter(
+  (sp) => sp.lat && sp.lng
+);
+
+// Merge: static + IG + sheet, deduplicate by name
+const seenNames = new Set<string>();
+const allPlaces: Place[] = [];
+for (const list of [basePlaces, igPlaces, sheetPlaces]) {
+  for (const p of list) {
+    const key = p.name.toLowerCase();
+    if (!seenNames.has(key)) {
+      seenNames.add(key);
+      allPlaces.push(p);
+    }
+  }
+}
 
 type DistanceFilter = "all" | "walk" | "nearby" | "metro" | "daytrip";
 
