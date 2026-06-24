@@ -669,9 +669,6 @@ export default function App() {
                             : {}
                         }
                       >
-                        {categoryFilter !== cat && (
-                          <span className="chip-dot" style={{ backgroundColor: CATEGORY_COLORS[cat] }} />
-                        )}
                         {CATEGORY_LABELS[cat]}
                       </button>
                     ))}
