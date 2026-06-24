@@ -921,6 +921,10 @@ body {
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: box-shadow 0.15s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer;
 }
 
 .saved-card:hover {

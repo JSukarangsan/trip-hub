@@ -647,7 +647,7 @@ function SavedCollectionPage() {
         />
         <div className="saved-grid">
           {filtered.map((post, i) => (
-            <div key={i} className="saved-card">
+            <a key={i} className="saved-card" href={post.permalink} target="_blank" rel="noopener noreferrer">
               <div className="saved-card-header">
                 <span className="saved-avatar">{post.username.slice(0, 2)}</span>
                 <span className="saved-username">@{post.username}</span>
@@ -664,13 +664,7 @@ function SavedCollectionPage() {
                 )}
                 <div className="saved-caption">{post.caption.slice(0, 150)}{post.caption.length > 150 ? "..." : ""}</div>
               </div>
-              <div className="saved-card-footer">
-                <a href={post.permalink} target="_blank" rel="noopener noreferrer">View on IG</a>
-                {post.enriched_lat && post.enriched_lng && (
-                  <a href={`https://www.google.com/maps?q=${post.enriched_lat},${post.enriched_lng}`} target="_blank" rel="noopener noreferrer">Map</a>
-                )}
-              </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>
