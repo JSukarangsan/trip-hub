@@ -381,7 +381,7 @@ function MapMarkers({
           onCloseClick={() => onSelect(null)}
           pixelOffset={[0, -10]}
         >
-          <div style={{ fontFamily: "Inter, -apple-system, sans-serif", maxWidth: 300 }}>
+          <div style={{ fontFamily: "Inter, -apple-system, sans-serif", width: 500 }}>
             {details.photoUrls.length > 0 && (
               <div style={{ position: "relative", marginBottom: 8 }}>
                 <div
@@ -394,8 +394,8 @@ function MapMarkers({
                       src={url}
                       alt={`${selectedPlace.name} ${i + 1}`}
                       style={{
-                        width: details.photoUrls.length === 1 ? "100%" : 200,
-                        height: 150,
+                        width: details.photoUrls.length === 1 ? "100%" : 340,
+                        height: 280,
                         objectFit: "cover",
                         borderRadius: 6,
                         flexShrink: 0,
@@ -406,11 +406,11 @@ function MapMarkers({
                 {details.photoUrls.length > 1 && (
                   <>
                     <button
-                      onClick={(e) => { e.stopPropagation(); document.getElementById("photo-strip")?.scrollBy(-210, 0); }}
+                      onClick={(e) => { e.stopPropagation(); document.getElementById("photo-strip")?.scrollBy(-350, 0); }}
                       style={{ position: "absolute", left: 4, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%", width: 28, height: 28, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }}
                     >&lsaquo;</button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); document.getElementById("photo-strip")?.scrollBy(210, 0); }}
+                      onClick={(e) => { e.stopPropagation(); document.getElementById("photo-strip")?.scrollBy(350, 0); }}
                       style={{ position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%", width: 28, height: 28, cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }}
                     >&rsaquo;</button>
                   </>
