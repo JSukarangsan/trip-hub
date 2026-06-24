@@ -594,6 +594,89 @@ function ItineraryPage() {
   );
 }
 
+interface IGPost {
+  enriched_place: string;
+  enriched_note: string;
+  enriched_address: string;
+  enriched_lat: number | string;
+  enriched_lng: number | string;
+  permalink: string;
+  username: string;
+  full_name: string;
+  caption: string;
+  thumbnail_url: string;
+  all_image_urls: string[];
+  is_carousel: boolean;
+  image_count: number;
+}
+
+function SavedCollectionPage() {
+  const [posts, setPosts] = useState<IGPost[]>([]);
+  const [filter, setFilter] = useState("");
+
+  useEffect(() => {
+    fetch("/ig-collection.json")
+      .then((r) => r.json())
+      .then((data: IGPost[]) => setPosts(data))
+      .catch(() => {});
+  }, []);
+
+  const filtered = posts.filter((p) => {
+    if (!filter) return true;
+    const q = filter.toLowerCase();
+    return (
+      (p.enriched_place || "").toLowerCase().includes(q) ||
+      (p.username || "").toLowerCase().includes(q) ||
+      (p.caption || "").toLowerCase().includes(q) ||
+      (p.enriched_note || "").toLowerCase().includes(q)
+    );
+  });
+
+  return (
+    <div className="saved-page">
+      <div className="saved-inner">
+        <h2 className="saved-title">Saved from Instagram</h2>
+        <p className="saved-subtitle">{posts.length} posts from @jess_heads_west collection</p>
+        <input
+          className="saved-search"
+          type="text"
+          placeholder="Search posts..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+        <div className="saved-grid">
+          {filtered.map((post, i) => (
+            <div key={i} className="saved-card">
+              <div className="saved-card-header">
+                <span className="saved-avatar">{post.username.slice(0, 2)}</span>
+                <span className="saved-username">@{post.username}</span>
+                {post.is_carousel && <span className="saved-carousel-badge">{post.image_count} imgs</span>}
+              </div>
+              {post.thumbnail_url && (
+                <img className="saved-card-img" src={post.thumbnail_url} loading="lazy" alt="" />
+              )}
+              <div className="saved-card-body">
+                {post.enriched_place && <div className="saved-place-name">{post.enriched_place}</div>}
+                {post.enriched_note && <div className="saved-note">{post.enriched_note}</div>}
+                {post.enriched_address && (
+                  <div className="saved-address">{post.enriched_address.split(",").slice(0, 3).join(",")}</div>
+                )}
+                <div className="saved-caption">{post.caption.slice(0, 150)}{post.caption.length > 150 ? "..." : ""}</div>
+              </div>
+              <div className="saved-card-footer">
+                <a href={post.permalink} target="_blank" rel="noopener noreferrer">View on IG</a>
+                {post.enriched_lat && post.enriched_lng && (
+                  <a href={`https://www.google.com/maps?q=${post.enriched_lat},${post.enriched_lng}`} target="_blank" rel="noopener noreferrer">Map</a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [categoryFilter, setCategoryFilter] = useState<Category | "all">("all");
   const [distanceFilter, setDistanceFilter] = useState<DistanceFilter>("all");
@@ -602,7 +685,7 @@ export default function App() {
   const [showList, setShowList] = useState(true);
   const [showTransit, setShowTransit] = useState(false);
   const [showArrondissements, setShowArrondissements] = useState(false);
-  const [view, setView] = useState<"places" | "itinerary">("places");
+  const [view, setView] = useState<"places" | "itinerary" | "saved">("places");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const daysLeft = getDaysUntilTrip();
@@ -644,6 +727,7 @@ export default function App() {
                 <div className="nav-menu">
                   <button className={view === "places" ? "active" : ""} onClick={() => { setView("places"); setMenuOpen(false); }}>Places</button>
                   <button className={view === "itinerary" ? "active" : ""} onClick={() => { setView("itinerary"); setMenuOpen(false); }}>Itinerary</button>
+                  <button className={view === "saved" ? "active" : ""} onClick={() => { setView("saved"); setMenuOpen(false); }}>Saved Posts</button>
                   <div className="nav-menu-extras">
                     <PhraseTray />
                     <NeighborhoodTray />
@@ -679,6 +763,8 @@ export default function App() {
 
       {view === "itinerary" ? (
         <ItineraryPage />
+      ) : view === "saved" ? (
+        <SavedCollectionPage />
       ) : (
       <div className="main">
         <aside className={`sidebar${!showList ? " hidden-mobile" : ""}`}>
