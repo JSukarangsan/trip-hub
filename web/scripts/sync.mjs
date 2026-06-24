@@ -18,7 +18,7 @@ const CACHE_FILE = resolve(DATA_DIR, "sheet-places.json");
 
 const SHEET_ID = "1eu_Zo9u5xEPuEs-4sxbaOY45SR49Bq51vnwopNv-UM4";
 const SHEETS_KEY = process.env.GOOGLE_SHEETS_API_KEY;
-const MAPS_KEY = process.env.GOOGLE_MAPS_API_KEY;
+const MAPS_KEY = process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY;
 
 const APT = { lat: 48.8534, lng: 2.2867 };
 

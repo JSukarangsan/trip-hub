@@ -14,13 +14,14 @@ Read from and write to the family's Google Sheets trip planning document.
 
 1. **Daily Itinerary** — Date, Day, Segment, Lodging, Jess Schedule, Sloane Schedule, Activities, Meals, Notes
 2. **Time Zones** — CEST/PST/EST reference
-3. **Fitness/Wellness** — Category, Name, Website, Distance, Metro, Pricing, Rating, English, Hours, Notes
+3. **Places** — Category, Name, Website, Distance from Apt, Metro, Pricing, Rating, English Friendly, Hours, Notes (renamed from Fitness/Wellness — now includes all place types: fitness, restaurants, markets, shopping, attractions, etc.)
 4. **Flights** — Leg, Date, Airline, Flight#, Confirmation, Airports, Times, Terminals, Duration, Seats, Cost
 5. **Lodging** — Segment, Check-in, Check-out, Nights, Property, Address, Platform, Confirmation, Cost, Notes
-6. **Provence Research** — Hotel options with URLs and costs
+6. **Post Paris Options** — Hotel options with URLs and costs
 7. **Childcare** — Program, Location, Distance, Availability, Languages, Dates, Days/Week, Hours, Cost, Status, Notes
-8. **Tasks** — Priority, Category, Task, Owner, Due, Status, Notes
+8. **To Do** — Priority, Category, Task, Owner, Due, Status, Notes
 9. **Holidays** — Date, Day, Country, Holiday, Closures, Impact
+10. **Nannies** — Nanny research and contacts
 
 ## Read Operations
 - Pull venue data for recommendations (fitness, restaurants, attractions)

@@ -52,7 +52,7 @@ When the trip starts (Jul 17), switch to **trip mode** — daily digests, live r
 When the family tells you something new or asks you to save something, persist it in two places:
 
 1. **Google Sheet** (source of truth) — write to the correct tab:
-   - New gym/studio → append row to "Gyms & Wellness"
+   - New place (restaurant, gym, shop, attraction, etc.) → append row to "Places" with Category, Name, and any available details
    - New task or status change → update "To Do"
    - Childcare update → update "Childcare"
    - Trip/itinerary change → update "Daily Itinerary"
@@ -94,6 +94,21 @@ When someone shares a location or mentions where they are ("we're in the Marais"
 
 ### Packing/Prep Nudge
 - Evening check-in should include tomorrow's weather: "Tomorrow is 32°C — sunscreen day. Cools to 19°C by dinner, bring a layer."
+
+## Trip Hub Web App
+
+There is a web app at **https://trip-hub-paris.netlify.app** that visualizes the trip:
+- Interactive map of all places (pins, filters by category/distance/region)
+- Full itinerary timeline grouped by week
+- Phrase du jour and Quartier du jour daily content
+- Live clocks for LA, NY, Paris
+
+The web app pulls from the same Google Sheet. When you add a place to the "Places" tab, you can trigger a sync to make it appear on the map:
+
+1. Add the place to the Google Sheet "Places" tab (just name + category is enough)
+2. Trigger a rebuild by POSTing to the build hook: `curl -X POST https://api.netlify.com/build_hooks/6a3bb7083c71234b9dbed84b`
+
+The build process will geocode new places and deploy the updated map. You can reference the web app when the family asks "where is X?" or wants to see everything on a map — send them the link.
 
 ## Rules
 
